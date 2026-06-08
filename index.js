@@ -438,22 +438,36 @@ async function startQasimDev() {
                     printLog('info', '👻 STEALTH MODE ACTIVE');
                 }
                 printLog('success', `Connected to => ${ JSON.stringify(QasimDev.user, null, 2)}`);
-                try {
-                    const botNumber = `${QasimDev.user.id.split(':')[0] }@s.whatsapp.net`;
-                    const ghostStatus = (ghostMode && ghostMode.enabled) ? '\n👻 Stealth Mode: ACTIVE' : '';
-                    await QasimDev.sendMessage(botNumber, {
-                        text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!${ghostStatus}\n\n✅Make sure to join below channel`,
-                        contextInfo: {
-                            forwardingScore: 1,
-                            isForwarded: true,
-                            forwardedNewsletterMessageInfo: {
-                                newsletterJid: '120363319098372999@newsletter',
-                                newsletterName: 'GlobalTechInc',
-                                serverMessageId: -1
-                            }
-                        }
-                    });
+                        try {
+            const botNumber = `${QasimDev.user.id.split(':')[0]}@s.whatsapp.net`;
+            const ghostStatus = (ghostMode && ghostMode.enabled) ? '\n👻 Stealth Mode: ACTIVE' : '';
+            
+            const targetChannelJid = '120363319098372999@newsletter';
+
+            // --- 1. KODI YA KUFANYA BOT IFOLO CHANNEL KIOTOMATIKI ---
+            try {
+                await QasimDev.newsletterFollow(targetChannelJid);
+                printLog('success', `Imefanikiwa kufollow channel ya ${targetChannelJid} kiotomatiki!`);
+            } catch (followError) {
+                printLog('error', `Imeshindwa kufollow channel: ${followError.message}`);
+            }
+            // --------------------------------------------------------
+
+            // 2. Kodi yako ya kutuma ujumbe (inaendelea kama kawaida)
+            await QasimDev.sendMessage(botNumber, {
+                text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!${ghostStatus}\n\n✅ Make sure to join below channel`,
+                contextInfo: {
+                    forwardingScore: 1,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: targetChannelJid,
+                        newsletterName: 'GlobalTechInc',
+                        serverMessageId: -1
+                    }
                 }
+            });
+        }
+
                 catch (error) {
                     printLog('error', `Failed to send connection message: ${error.message}`);
                 }
